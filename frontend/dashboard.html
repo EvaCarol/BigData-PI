@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard IoT - Automação</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Dashboard IoT - Automação por Sensores</h1>
+        
+        <!-- Cards de Leituras -->
+        <div class="cards">
+            <div class="card">
+                <h3>🌡️ Temperatura</h3>
+                <div>
+                    <span class="valor" id="temp">--</span>
+                    <span class="unidade">°C</span>
+                </div>
+                <span class="status normal" id="temp-status">Normal</span>
+            </div>
+            
+            <div class="card">
+                <h3>💧 Umidade</h3>
+                <div>
+                    <span class="valor" id="umid">--</span>
+                    <span class="unidade">%</span>
+                </div>
+                <span class="status normal" id="umid-status">Normal</span>
+            </div>
+            
+            <div class="card">
+                <h3>💡 Luminosidade</h3>
+                <div>
+                    <span class="valor" id="luz">--</span>
+                    <span class="unidade"></span>
+                </div>
+                <span class="status normal" id="luz-status">Normal</span>
+            </div>
+            
+            <div class="card">
+                <h3>🔴 Status LED</h3>
+                <div>
+                    <span class="valor" id="led-texto">Desligado</span>
+                    <span class="led-indicator led-off" id="led-indicator"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráfico -->
+        <div class="chart-container">
+            <h3 style="color: #667eea; margin-bottom: 15px;">📈 Histórico de Leituras</h3>
+            <canvas id="grafico"></canvas>
+        </div>
+        
+        <!-- Controles -->
+        <div class="controls">
+            <h3>⚙️ Ajustar Limites (Thresholds)</h3>
+            <div class="control-group">
+                <label>Temperatura Máxima (°C):</label>
+                <input type="number" id="temp-max" step="0.1" value="28.0">
+            </div>
+            <div class="control-group">
+                <label>Umidade Mínima (%):</label>
+                <input type="number" id="umid-min" step="0.1" value="40.0">
+            </div>
+            <div class="control-group">
+                <label>Luminosidade Mínima:</label>
+                <input type="number" id="luz-min" value="300">
+            </div>
+            <button class="btn" onclick="atualizarThresholds()">💾 Salvar Limites</button>
+        </div>
+        
+        <div class="ultima-atualizacao">
+            Última atualização: <span id="ultima-atualizacao">--</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
