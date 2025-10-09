@@ -2,6 +2,12 @@
 
 ## 📖 Visão Geral
 
+
+## ✨ Autores
+
+**Grupo: Evellyn Silva, Deyvid Diogo, Stella Albertina, Marcos Victor, José Eduardo, Rafael Luiz e Isadora Francisca** 
+**Disciplina:** IoT e Big Data
+
 Este projeto implementa um **sistema de automação IoT híbrido** que combina processamento local (edge computing) com inteligência na nuvem (cloud computing). O sistema monitora temperatura, umidade e luminosidade, tomando decisões automáticas para acionar atuadores (LED/relé).
 
 ### 🎯 Objetivo
@@ -591,10 +597,6 @@ iot/
 
 ---
 
-## ✨ Autores
-
-**Grupo:** 
-**Disciplina:** IoT 
 
 
 ---
