@@ -13,7 +13,7 @@ CORS(app)
 # ========== CONEXÃO COM MONGO ATLAS ==========
 # ATENÇÃO: A senha do MongoDB está hardcoded na string de conexão.
 # É recomendado usar variáveis de ambiente para a senha.
-MONGO_URI = "mongodb+srv://evellyncarolyne12:erica1982@receitas.2dwrpuz.mongodb.net/"
+MONGO_URI = "mongodb+srv://evellyncarolyne12:@receitas.2dwrpuz.mongodb.net/"
 client = MongoClient(MONGO_URI)
 db = client["iot_database"]  # nome do banco
 colecao_leituras = db["leituras"]
