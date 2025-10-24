@@ -98,23 +98,56 @@ Este script irá:
 *   Criar um ambiente virtual na pasta `backend`.
 *   Instalar as dependências do Python.
 
+### **Configuração de Variáveis de Ambiente**
+
+Para que o backend e o frontend se comuniquem corretamente, é necessário configurar o IP da sua máquina e a porta da API.
+
+#### Backend (`backend/.env`)
+
+Crie um arquivo `.env` na pasta `backend` com o seguinte conteúdo:
+
+```
+API_HOST=SEU_IP_LOCAL
+API_PORT=5001
+```
+
+*   **`SEU_IP_LOCAL`**: Substitua por o endereço IP da sua máquina na rede local (ex: `192.168.1.100`). Você pode obter seu IP local executando `ifconfig` (Linux/macOS) ou `ipconfig` (Windows) no terminal.
+*   **`API_PORT`**: A porta em que a API Flask será executada. O padrão é `5001`.
+
+#### Frontend (`frontend/config.js`)
+
+O frontend também precisa saber o IP e a porta da API. Um arquivo `config.js` já foi criado na pasta `frontend`. Edite-o com o IP da sua máquina:
+
+```javascript
+const API_HOST = "SEU_IP_LOCAL"; // Substitua pelo IP da sua máquina
+const API_PORT = 5001;
+const API_URL = `http://${API_HOST}:${API_PORT}/api`;
+```
+
+*   **`SEU_IP_LOCAL`**: Substitua pelo mesmo endereço IP usado no `.env` do backend.
+*   **`API_PORT`**: Mantenha `5001` ou a porta que você configurou no backend.
+
+---
+
 ### **PASSO 2: Configurar o Backend (API)**
+
+Após configurar as variáveis de ambiente no arquivo `backend/.env` (conforme descrito acima), o backend estará pronto para ser iniciado.
 
 ```bash
 # 1. Clone ou baixe o projeto
 cd backend
 
-# 2. Crie um ambiente virtual (recomendado)
-python -m venv venv
+# 2. Crie um ambiente virtual (recomendado) - Já feito pelo setup.sh
+# python -m venv venv
 
 # Windows:
-venv\Scripts\activate
+# venv\Scripts\activate
 
-# 3. Instale as dependências
-pip install -r requirements.txt
+# 3. Instale as dependências - Já feito pelo setup.sh
+# pip install -r requirements.txt
 
-# 4. Execute a API
-python api.py
+# 4. Execute a API (será feito pelo start_dev.sh)
+# ./venv/bin/python api.py
 ```
 
 ### **PASSO 2: Configurar o ESP-CAM**
@@ -135,7 +168,7 @@ python api.py
     ```cpp
     const char* ssid = "minhaRede";
     const char* password = "12345678";
-    const char* api_url = "http://<SEU_IP_AQUI>:5000/api/leituras"; // <<-- Altere para o IP do seu computador
+    const char* api_url = "http://<SEU_IP_AQUI>:<PORTA_API>/api/leituras"; // <<-- Altere para o IP e Porta da sua API (definidos no .env)
     ```
 5.  Conecte o ESP-CAM ao computador e faça o upload do código.
 
@@ -149,9 +182,9 @@ Para facilitar os testes, utilize o script `start_dev.sh`:
 
 Este script irá:
 
-*   Iniciar a API do backend.
-*   Iniciar o simulador de sensores.
-*   Abrir o dashboard no seu navegador padrão.
+*   Iniciar a API do backend (utilizando o `API_HOST` e `API_PORT` do `.env`).
+*   Iniciar o simulador de sensores (utilizando o `API_HOST` e `API_PORT` do `.env`).
+*   Abrir o dashboard no seu navegador padrão (que buscará a API usando o `API_HOST` e `API_PORT` do `config.js`).
 
 ---
 
@@ -164,15 +197,15 @@ Este script irá:
 
 | Teste | Como Verificar | Resultado Esperado |
 |-------|----------------|-------------------|
-| API Online | Acesse `http://localhost:5000` no navegador | JSON com `"status": "API IoT Online"` |
-| Endpoint Leituras | `curl http://localhost:5000/api/leituras` | JSON com `"total": 0, "leituras": []` |
-| Endpoint Thresholds | `curl http://localhost:5000/api/thresholds` | JSON com `temp_max`, `umid_min`, `luz_min` |
+| API Online | Acesse `http://localhost:5001` no navegador | JSON com `"status": "API IoT Online"` |
+| Endpoint Leituras | `curl http://localhost:5001/api/leituras` | JSON com `"total": 0, "leituras": []` |
+| Endpoint Thresholds | `curl http://localhost:5001/api/thresholds` | JSON com `temp_max`, `umid_min`, `luz_min` |
 
 **Console da API deve mostrar:**
 ```
 🚀 Iniciando API IoT...
-📍 Acesse: http://localhost:5000
- * Running on http://0.0.0.0:5000
+📍 Acesse: http://localhost:5001
+ * Running on http://0.0.0.0:5001
 ```
 
 ---
@@ -262,7 +295,7 @@ Limites: Temp>28.0 | Umid<40.0 | Luz<300
 1. **API rodando** ✓
 2. **ESP32 conectado ao WiFi** ✓
 3. Aguarde 10 segundos
-4. Acesse `http://localhost:5000/api/leituras` no navegador
+4. Acesse `http://localhost:5001/api/leituras` no navegador
 
 **✅ Resultado Esperado:**
 ```json
@@ -306,7 +339,7 @@ Limites: Temp>28.0 | Umid<40.0 | Luz<300
 
 **❌ Se falhar:**
 - Verifique console do navegador (F12)
-- Teste manualmente: `curl -X PUT http://localhost:5000/api/thresholds -H "Content-Type: application/json" -d '{"temp_max":25.0}'`
+- Teste manualmente: `curl -X PUT http://localhost:5001/api/thresholds -H "Content-Type: application/json" -d '{"temp_max":25.0}'`
 - Verifique CORS na API (Flask-CORS instalado?)
 
 ---
@@ -384,7 +417,7 @@ void loop() {
 ```
 
 **Soluções:**
-- [ ] Verifique se API está rodando: `curl http://localhost:5000`
+- [ ] Verifique se API está rodando: `curl http://localhost:5001`
 - [ ] IP correto? Use `ipconfig` (Windows) ou `ifconfig` (Linux/Mac)
 - [ ] Porta 5000 livre? Teste: `netstat -an | grep 5000`
 - [ ] Firewall bloqueando? Adicione exceção para porta 5000
@@ -402,12 +435,12 @@ void loop() {
 - [ ] F12 → Console, verifique erros
 - [ ] CORS bloqueado? Verifique se `flask-cors` está instalado
 - [ ] IP da API correto no `dashboard.html`?
-- [ ] API está retornando dados? Teste: `curl http://localhost:5000/api/leituras`
+- [ ] API está retornando dados? Teste: `curl http://localhost:5001/api/leituras`
 - [ ] Desabilite extensões de bloqueio (AdBlock, uBlock)
 
 **Teste manual no console do navegador:**
 ```javascript
-fetch('http://192.168.1.100:5000/api/leituras')
+fetch('http://192.168.1.100:5001/api/leituras')
   .then(r => r.json())
   .then(d => console.log(d));
 ```

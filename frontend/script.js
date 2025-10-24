@@ -1,5 +1,4 @@
-// Configuração da API
-const API_URL = 'http://localhost:5000/api';  // ALTERE PARA SEU SERVIDOR
+
 
 // Dados para o gráfico
 let dadosGrafico = {
@@ -112,7 +111,6 @@ function atualizarCards(leitura) {
         document.getElementById('faces').textContent = leitura.faces_detectadas;
         atualizarStatus('faces', leitura.faces_detectadas > 0, 'Nenhum');
     }
-}
 }
 
 // Atualiza status visual
