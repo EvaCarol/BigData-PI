@@ -1,45 +1,56 @@
 import requests
 import random
 import time
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # URL do seu backend Flask (ajuste o IP se necessário)
-URL_API = "http://172.26.37.69:5000/api/leituras"
+API_HOST = os.getenv("API_HOST", "localhost")
+API_PORT = os.getenv("API_PORT", 5001)
+URL_API = f"http://{API_HOST}:{API_PORT}/api/leituras"
 
-# Função para gerar dados simulados
+cenarios = [
+    {
+        "status": "EXCELENTE",
+        "temp_range": (21.0, 23.0),
+        "umid_range": (50.0, 60.0),
+        "ar_range": (200, 350),
+        "co_range": (20, 50)
+    },
+    {
+        "status": "BOA",
+        "temp_range": (25.0, 27.0),
+        "umid_range": (60.0, 70.0),
+        "ar_range": (400, 550),
+        "co_range": (50, 100)
+    },
+    {
+        "status": "MODERADA",
+        "temp_range": (29.0, 31.0),
+        "umid_range": (65.0, 75.0),
+        "ar_range": (600, 750),
+        "co_range": (100, 200)
+    },
+    {
+        "status": "RUIM",
+        "temp_range": (31.0, 33.0),
+        "umid_range": (75.0, 85.0),
+        "ar_range": (800, 1000),
+        "co_range": (200, 400)
+    }
+]
+
 def gerar_dados_simulados(ciclo):
-    if ciclo == 0:  # Excelente
-        return {
-            "temperatura": round(random.uniform(21.0, 23.0), 1),
-            "umidade": round(random.uniform(50.0, 60.0), 1),
-            "qualidadeAr": random.randint(200, 350),
-            "nivelCO": random.randint(20, 50),
-            "statusQualidade": "EXCELENTE"
-        }
-    elif ciclo == 1:  # Boa
-        return {
-            "temperatura": round(random.uniform(25.0, 27.0), 1),
-            "umidade": round(random.uniform(60.0, 70.0), 1),
-            "qualidadeAr": random.randint(400, 550),
-            "nivelCO": random.randint(50, 100),
-            "statusQualidade": "BOA"
-        }
-    elif ciclo == 2:  # Moderada
-        return {
-            "temperatura": round(random.uniform(29.0, 31.0), 1),
-            "umidade": round(random.uniform(65.0, 75.0), 1),
-            "qualidadeAr": random.randint(600, 750),
-            "nivelCO": random.randint(100, 200),
-            "statusQualidade": "MODERADA"
-        }
-    else:  # Ruim
-        return {
-            "temperatura": round(random.uniform(31.0, 33.0), 1),
-            "umidade": round(random.uniform(75.0, 85.0), 1),
-            "qualidadeAr": random.randint(800, 1000),
-            "nivelCO": random.randint(200, 400),
-            "statusQualidade": "RUIM"
-        }
-
+    cenario = cenarios[ciclo]
+    return {
+        "temperatura": round(random.uniform(*cenario["temp_range"]), 1),
+        "umidade": round(random.uniform(*cenario["umid_range"]), 1),
+        "qualidadeAr": random.randint(*cenario["ar_range"]),
+        "nivelCO": random.randint(*cenario["co_range"]),
+        "statusQualidade": cenario["status"]
+    }
 # Loop contínuo de simulação
 if __name__ == "__main__":
     ciclo = 0
