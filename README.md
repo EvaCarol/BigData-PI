@@ -8,72 +8,64 @@
 **Grupo: Evellyn Silva, Deyvid Diogo, Stella Albertina, Marcos Victor, José Eduardo, Rafael Luiz e Isadora Francisca** 
 **Disciplina:** IoT e Big Data
 
-Este projeto implementa um **sistema de automação IoT híbrido** que combina processamento local (edge computing) com inteligência na nuvem (cloud computing). O sistema monitora temperatura, umidade e luminosidade, tomando decisões automáticas para acionar atuadores (LED/relé).
+Este projeto implementa um sistema de automação e monitoramento IoT que utiliza um ESP-CAM para contagem de rostos e um sensor DHT22 para medir temperatura e umidade. Os dados são enviados para uma API em Flask e visualizados em um dashboard web.
 
 ### 🎯 Objetivo
-Demonstrar a diferença entre **decisões locais** (rápidas, funcionam offline) e **decisões na nuvem** (flexíveis, permitem controle remoto), implementando um sistema fail-safe que funciona mesmo sem conexão com a internet.
+Demonstrar a integração de um ESP-CAM com um backend em Flask e um frontend em tempo real, mostrando a contagem de rostos, temperatura e umidade.
 
 ---
 
-## 🏗️ Arquitetura do Sistema
+##  fluxo do Sistema
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    CAMADA FÍSICA (Edge)                     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  DHT11   │  │   LDR    │  │   LED    │  │  ESP32   │   │
-│  │ Temp/Umid│  │   Luz    │  │ Atuador  │  │   C3     │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-│                                                             │
-│  Decisões locais: < 100ms | Funciona offline               │
-└─────────────────────────────────────────────────────────────┘
-                            ↕ WiFi (HTTP)
-┌─────────────────────────────────────────────────────────────┐
-│                    CAMADA DE NUVEM (Cloud)                  │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │              API REST (Flask)                        │  │
-│  │  • POST /api/leituras  → Armazena dados             │  │
-│  │  • GET  /api/leituras  → Retorna histórico          │  │
-│  │  • GET  /api/thresholds → Retorna limites           │  │
-│  │  • PUT  /api/thresholds → Atualiza limites          │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                                                             │
-│  Armazenamento | Análise | Controle remoto                 │
-└─────────────────────────────────────────────────────────────┘
-                            ↕ HTTP
-┌─────────────────────────────────────────────────────────────┐
-│                  CAMADA DE VISUALIZAÇÃO                     │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │          Dashboard Web (HTML/JS/Chart.js)            │  │
-│  │  • Visualização em tempo real                        │  │
-│  │  • Gráficos históricos                               │  │
-│  │  • Controle de thresholds                            │  │
-│  │  • Alertas visuais                                   │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-```
+1.  **ESP-CAM:**
+    *   Conecta-se ao Wi-Fi.
+    *   Lê a temperatura e umidade do sensor DHT22.
+    *   Utiliza a câmera para detectar e contar rostos em um intervalo de 1 minuto.
+    *   Envia os dados (temperatura, umidade e contagem de rostos) para a API a cada minuto.
+
+2.  **Backend (API Flask):**
+    *   Recebe os dados do ESP-CAM no endpoint `/api/leituras`.
+    *   Armazena os dados em um banco de dados MongoDB.
+
+3.  **Frontend (Dashboard):**
+    *   Busca os dados da API a cada 3 segundos.
+    *   Exibe a contagem de rostos, temperatura e umidade em tempo real.
+    *   Mostra um histórico dos dados em um gráfico.
 
 ---
 
 ## 🔧 Componentes do Projeto
 
-### 1. **Hardware (ESP32-C3)**
+### 1. **Hardware (ESP-CAM)**
 | Componente | Função | Pino |
 |------------|--------|------|
-| DHT11 | Sensor de temperatura e umidade | GPIO 4 |
-| LDR + Resistor 10kΩ | Sensor de luminosidade (divisor de tensão) | GPIO 2 (ADC) |
-| LED + Resistor 220Ω | Atuador (simulação de automação) | GPIO 5 |
+| ESP-CAM | Processamento e câmera | - |
+| DHT22 | Sensor de temperatura e umidade | GPIO 4 |
+
+**Diagrama de Pinos (ESP-CAM e DHT22):**
+
+```
++-----------------+      +---------+
+| ESP-CAM         |      | DHT22   |
+|                 |      |         |
+|   5V            +------+ VCC     |
+|   GND           +------+ GND     |
+|   GPIO 4        +------+ DATA    |
+|                 |      |         |
++-----------------+      +---------+
+```
 
 ### 2. **Software Backend (API)**
 - **Tecnologia:** Python 3.7+ com Flask
 - **Porta:** 5000
-- **Endpoints:** 4 rotas REST
-- **Armazenamento:** Em memória (pode ser substituído por BD)
+- **Endpoints:**
+    - `POST /api/leituras`: Recebe dados dos sensores e salva no banco
+    - `GET /api/leituras`: Retorna últimas leituras do MongoDB
 
 ### 3. **Interface (Dashboard)**
 - **Tecnologia:** HTML5 + JavaScript + Chart.js
 - **Atualização:** Automática a cada 3 segundos
-- **Features:** Visualização em tempo real, gráficos, controle de limites
+- **Features:** Visualização em tempo real, gráficos, contagem de rostos
 
 ---
 
@@ -82,10 +74,8 @@ Demonstrar a diferença entre **decisões locais** (rápidas, funcionam offline)
 ### **Pré-requisitos**
 
 #### Hardware:
-- [x] ESP32-C3 ou placa compatível
-- [x] Sensor DHT11
-- [x] LDR + Resistor 10kΩ
-- [x] LED + Resistor 220Ω
+- [x] ESP-CAM
+- [x] Sensor DHT22
 - [x] Protoboard e jumpers
 - [x] Cabo USB para programação
 
@@ -96,7 +86,19 @@ Demonstrar a diferença entre **decisões locais** (rápidas, funcionam offline)
 
 ---
 
-### **PASSO 1: Configurar o Backend (API)**
+### **PASSO 1: Configurar o Ambiente**
+
+```bash
+./setup.sh
+```
+
+Este script irá:
+
+*   Verificar se o Python 3 e o pip estão instalados.
+*   Criar um ambiente virtual na pasta `backend`.
+*   Instalar as dependências do Python.
+
+### **PASSO 2: Configurar o Backend (API)**
 
 ```bash
 # 1. Clone ou baixe o projeto
@@ -113,82 +115,46 @@ pip install -r requirements.txt
 
 # 4. Execute a API
 python api.py
-
-# ✅ Você deve ver:
-# 🚀 Iniciando API IoT...
-# 📍 Acesse: http://localhost:5000
-# * Running on http://0.0.0.0:5000
 ```
 
-**Teste se está funcionando:**
+### **PASSO 2: Configurar o ESP-CAM**
+
+1.  Abra o arquivo `hardware/espcam_dht22_face_counter.ino` na Arduino IDE.
+2.  **Instale as bibliotecas necessárias:**
+    *   `DHT sensor library` (by Adafruit)
+    *   `Adafruit Unified Sensor`
+    *   `ArduinoJson` (versão 6.x)
+3.  **Configure a placa:**
+    *   Vá em **File → Preferences** e adicione a seguinte URL em "Additional Board Manager URLs":
+        ```
+        https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+        ```
+    *   Vá em **Tools → Board → Boards Manager** e instale o **esp32**.
+    *   Selecione a placa **AI Thinker ESP32-CAM** em **Tools → Board**.
+4.  **Altere as seguintes variáveis no código:**
+    ```cpp
+    const char* ssid = "minhaRede";
+    const char* password = "12345678";
+    const char* api_url = "http://<SEU_IP_AQUI>:5000/api/leituras"; // <<-- Altere para o IP do seu computador
+    ```
+5.  Conecte o ESP-CAM ao computador e faça o upload do código.
+
+### **PASSO 3: Iniciar o Ambiente de Desenvolvimento**
+
+Para facilitar os testes, utilize o script `start_dev.sh`:
+
 ```bash
-# Em outro terminal:
-curl http://localhost:5000
-# Deve retornar JSON com status da API
+./start_dev.sh
 ```
 
----
+Este script irá:
 
-### **PASSO 2: Configurar o ESP32-C3**
-
-#### 2.1 Instalar Bibliotecas no Arduino IDE
-
-1. Abra **Arduino IDE**
-2. Vá em **Sketch → Include Library → Manage Libraries**
-3. Instale:
-   - `DHT sensor library` (by Adafruit)
-   - `Adafruit Unified Sensor`
-   - `ArduinoJson` (versão 6.x)
-
-#### 2.2 Configurar Placa ESP32
-
-1. **File → Preferences**
-2. Em "Additional Board Manager URLs", adicione:
-   ```
-   https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-   ```
-3. **Tools → Board → Boards Manager**
-4. Instale **esp32** (by Espressif Systems)
-5. Selecione: **Tools → Board → ESP32C3 Dev Module**
-
-#### 2.3 Editar Código
-
-Abra o arquivo `esp32_automation.ino` e **ALTERE**:
-
-```cpp
-// ========== CONFIGURAÇÕES ==========
-// WiFi
-const char* ssid = "WIFI";          
-const char* password = "SENHA";       
-
-// API
-const char* apiURL = "http://localhost:5000/api";  do seu PC
-```
-
-**Como descobrir o IP do seu PC:**
-- Windows: `ipconfig` no CMD
-- Linux/Mac: `ifconfig` ou `ip addr`
-
-#### 2.4 Upload do Código
-
-1. Conecte o ESP32 via USB
-2. **Tools → Port** → Selecione a porta COM correta
-3. Clique em **Upload** (→)
-4. Aguarde "Done uploading"
+*   Iniciar a API do backend.
+*   Iniciar o simulador de sensores.
+*   Abrir o dashboard no seu navegador padrão.
 
 ---
 
-### **PASSO 3: Configurar o Dashboard**
-
-1. Abra o arquivo `dashboard.html` em um editor de texto
-2. **Localize e altere** (linha ~263):
-   ```javascript
-   const API_URL = 'http://localhost:5000/api';  
-   ```
-3. Salve o arquivo
-4. Abra o arquivo no navegador (duplo clique)
-
----
 
 ## ✅ Checklist de Verificação
 
