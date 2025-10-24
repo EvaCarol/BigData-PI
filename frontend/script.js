@@ -1,12 +1,12 @@
-// Configuração da API
-const API_URL = 'http://localhost:5000/api';  // ALTERE PARA SEU SERVIDOR
+
 
 // Dados para o gráfico
 let dadosGrafico = {
     labels: [],
     temp: [],
     umid: [],
-    luz: []
+    luz: [],
+    faces: []
 };
 
 // Cria o gráfico
@@ -35,6 +35,13 @@ const grafico = new Chart(ctx, {
                 data: dadosGrafico.luz,
                 borderColor: '#ffce56',
                 backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                tension: 0.4
+            },
+            {
+                label: 'Rostos Detectados',
+                data: dadosGrafico.faces,
+                borderColor: '#9966ff',
+                backgroundColor: 'rgba(153, 102, 255, 0.1)',
                 tension: 0.4
             }
         ]
@@ -98,6 +105,12 @@ function atualizarCards(leitura) {
     document.getElementById('led-texto').textContent = ledLigado ? 'Ligado' : 'Desligado';
     const ledIndicator = document.getElementById('led-indicator');
     ledIndicator.className = `led-indicator ${ledLigado ? 'led-on' : 'led-off'}`;
+
+    // Faces
+    if (leitura.hasOwnProperty('faces_detectadas')) {
+        document.getElementById('faces').textContent = leitura.faces_detectadas;
+        atualizarStatus('faces', leitura.faces_detectadas > 0, 'Nenhum');
+    }
 }
 
 // Atualiza status visual
@@ -120,6 +133,11 @@ function atualizarGrafico(leitura) {
     dadosGrafico.temp.push(leitura.temperatura);
     dadosGrafico.umid.push(leitura.umidade);
     dadosGrafico.luz.push(leitura.luminosidade / 10);  // Divide para escala
+    if (leitura.hasOwnProperty('faces_detectadas')) {
+        dadosGrafico.faces.push(leitura.faces_detectadas);
+    } else {
+        dadosGrafico.faces.push(0);
+    }
     
     // Limita a 20 pontos
     if (dadosGrafico.labels.length > 20) {
@@ -127,6 +145,7 @@ function atualizarGrafico(leitura) {
         dadosGrafico.temp.shift();
         dadosGrafico.umid.shift();
         dadosGrafico.luz.shift();
+        dadosGrafico.faces.shift();
     }
     
     grafico.update();

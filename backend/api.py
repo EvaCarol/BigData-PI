@@ -2,12 +2,18 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
 # ========== CONEXÃO COM MONGO ATLAS ==========
-MONGO_URI = "mongodb+srv://evellyncarolyne12:<Password>@receitas.2dwrpuz.mongodb.net/"
+# ATENÇÃO: A senha do MongoDB está hardcoded na string de conexão.
+# É recomendado usar variáveis de ambiente para a senha.
+MONGO_URI = "mongodb+srv://evellyncarolyne12:erica1982@receitas.2dwrpuz.mongodb.net/"
 client = MongoClient(MONGO_URI)
 db = client["iot_database"]  # nome do banco
 colecao_leituras = db["leituras"]
@@ -101,6 +107,8 @@ def atualizar_thresholds():
 
 # ================= EXECUÇÃO =================
 if __name__ == '__main__':
+    host = os.getenv("API_HOST", "0.0.0.0")
+    port = int(os.getenv("API_PORT", 5001))
     print("🚀 Iniciando API IoT com MongoDB Atlas...")
-    print("📍 Acesse: http://localhost:5000")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    print(f"📍 Acesse: http://{host}:{port}")
+    app.run(host=host, port=port, debug=True)
