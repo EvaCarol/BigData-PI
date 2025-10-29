@@ -1,5 +1,26 @@
 #!/bin/bash
 
+<<<<<<< HEAD
+=======
+#Windows
+# entra na pasta backend
+cd backend
+
+# cria o ambiente virtual
+python -m venv venv
+
+# ativa o ambiente virtual
+venv\Scripts\activate
+
+# instala as dependências
+pip install -r requirements.txt
+
+#Startar
+python app.py
+
+
+#Mac/OS
+>>>>>>> 3f426f2 (Ajustes)
 # Verifica se o Python 3 está instalado
 if ! command -v python3 &> /dev/null
 then
